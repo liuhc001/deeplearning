@@ -44,7 +44,6 @@ def load_data():
 (tk, topic_iw, topic_wi, train_data, test_data) = load_data()
 
 
-# https://github.com/ShawnyXiao/TextClassification-Keras/blob/master/model/TextCNN/text_cnn.py
 class MyModel(keras.Model):
     def __init__(self):
         super(MyModel, self).__init__()

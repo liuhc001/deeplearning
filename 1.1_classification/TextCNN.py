@@ -118,7 +118,7 @@ def test_step(texts, labels):
     test_accuracy(labels, predictions)
 
 
-EPOCHS = 100
+EPOCHS = 400
 train_data = train_data.batch(32)
 test_data = test_data.batch(32)
 for epoch in range(EPOCHS):

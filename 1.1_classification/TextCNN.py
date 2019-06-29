@@ -11,7 +11,11 @@ max_features = 100000
 embedding_dims = 10
 pos = __file__.rfind('/')
 if pos == -1:
-    cur = os.path.join(__file__[:__file__.rfind('\\')], 'data', 'reuters21578')
+    pos = __file__.rfind('\\')
+    if pos == -1:
+        cur = os.path.join('data', 'reuters21578')
+    else:
+        cur = os.path.join(__file__[:__file__.rfind('\\')], 'data', 'reuters21578')
 else:
     cur = os.path.join(__file__[:pos], 'data', 'reuters21578')
 
@@ -114,7 +118,7 @@ def test_step(texts, labels):
     test_accuracy(labels, predictions)
 
 
-EPOCHS = 20
+EPOCHS = 100
 train_data = train_data.batch(32)
 test_data = test_data.batch(32)
 for epoch in range(EPOCHS):
@@ -132,5 +136,4 @@ for epoch in range(EPOCHS):
                           train_accuracy.result() * 100,
                           test_loss.result(),
                           test_accuracy.result() * 100))
-
-# https://www.tinymind.cn/articles/4230
+model.save('model_textcnn')

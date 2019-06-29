@@ -50,32 +50,18 @@ def load_data():
 
 # https://github.com/ShawnyXiao/TextClassification-Keras/blob/master/model/TextCNN/text_cnn.py
 class MyModel(keras.Model):
-    def __init__(self):
+    def __init__(self, flag=1):
         super(MyModel, self).__init__()
         self.embedding = keras.layers.Embedding(max_features, embedding_dims, input_length=maxlen)
-        self.conv1_3 = keras.layers.Conv1D(128, 3, activation='relu')
-        self.pool1_3 = keras.layers.GlobalMaxPooling1D()
-        self.conv1_4 = keras.layers.Conv1D(128, 4, activation='relu')
-        self.pool1_4 = keras.layers.GlobalMaxPooling1D()
-        self.conv1_5 = keras.layers.Conv1D(128, 5, activation='relu')
-        self.pool1_5 = keras.layers.GlobalMaxPooling1D()
-        self.concatenate = keras.layers.Concatenate()
+        if flag == 1:
+            self.rnn = keras.layers.LSTM(128)
+        else:
+            self.rnn = keras.layers.GRU(128)
         self.d1 = keras.layers.Dense(len(topic_iw.keys()), activation='softmax')
-        self.d2 = keras.layers.Dense(10, activation='softmax')
 
     def call(self, x):
         embedding = self.embedding(x)
-        convs = []
-        x3 = self.conv1_3(embedding)
-        x3 = self.pool1_3(x3)
-        convs.append(x3)
-        x4 = self.conv1_4(embedding)
-        x4 = self.pool1_4(x4)
-        convs.append(x4)
-        x5 = self.conv1_5(embedding)
-        x5 = self.pool1_5(x5)
-        convs.append(x5)
-        x = self.concatenate(convs)
+        x = self.rnn(embedding)
         output = self.d1(x)
 
         return output
@@ -137,6 +123,6 @@ for epoch in range(EPOCHS):
                           test_loss.result(),
                           test_accuracy.result() * 100))
 
-tf.saved_model.save(model, 'model_textcnn')
+tf.saved_model.save(model, 'model_textrnn')
 
 # https://www.tinymind.cn/articles/4230

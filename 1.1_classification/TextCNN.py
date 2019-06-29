@@ -61,7 +61,7 @@ class MyModel(keras.Model):
         self.pool1_5 = keras.layers.GlobalMaxPooling1D()
         self.concatenate = keras.layers.Concatenate()
         self.d1 = keras.layers.Dense(len(topic_iw.keys()), activation='softmax')
-        self.d2 = keras.layers.Dense(10, activation='softmax')
+        # self.d2 = keras.layers.Dense(10, activation='softmax')
 
     def call(self, x):
         embedding = self.embedding(x)

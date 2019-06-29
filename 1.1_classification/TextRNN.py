@@ -10,7 +10,11 @@ max_features = 100000
 embedding_dims = 10
 pos = __file__.rfind('/')
 if pos == -1:
-    cur = os.path.join(__file__[:__file__.rfind('\\')], 'data', 'reuters21578')
+    pos = __file__.rfind('\\')
+    if pos == -1:
+        cur = os.path.join('data', 'reuters21578')
+    else:
+        cur = os.path.join(__file__[:__file__.rfind('\\')], 'data', 'reuters21578')
 else:
     cur = os.path.join(__file__[:pos], 'data', 'reuters21578')
 
@@ -44,6 +48,7 @@ def load_data():
 (tk, topic_iw, topic_wi, train_data, test_data) = load_data()
 
 
+# https://github.com/ShawnyXiao/TextClassification-Keras/blob/master/model/TextCNN/text_cnn.py
 class MyModel(keras.Model):
     def __init__(self):
         super(MyModel, self).__init__()
@@ -113,7 +118,7 @@ def test_step(texts, labels):
     test_accuracy(labels, predictions)
 
 
-EPOCHS = 20
+EPOCHS = 100
 train_data = train_data.batch(32)
 test_data = test_data.batch(32)
 for epoch in range(EPOCHS):

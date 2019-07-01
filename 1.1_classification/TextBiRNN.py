@@ -123,6 +123,6 @@ for epoch in range(EPOCHS):
                           test_loss.result(),
                           test_accuracy.result() * 100))
 
-tf.saved_model.save(model, 'model_textrnn')
+tf.saved_model.save(model, 'model_textbirnn')
 
 # https://www.tinymind.cn/articles/4230

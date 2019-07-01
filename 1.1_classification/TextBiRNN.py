@@ -54,14 +54,14 @@ class MyModel(keras.Model):
         super(MyModel, self).__init__()
         self.embedding = keras.layers.Embedding(max_features, embedding_dims, input_length=maxlen)
         if flag == 1:
-            self.rnn = keras.layers.LSTM(128)
+            self.birnn = keras.layers.Bidirectional(keras.layers.LSTM(128))
         else:
             self.rnn = keras.layers.GRU(128)
         self.d1 = keras.layers.Dense(len(topic_iw.keys()), activation='softmax')
 
     def call(self, x):
         embedding = self.embedding(x)
-        x = self.rnn(embedding)
+        x = self.birnn(embedding)
         output = self.d1(x)
 
         return output

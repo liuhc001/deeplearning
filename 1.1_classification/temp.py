@@ -54,7 +54,7 @@ class MyModel(keras.Model):
         super(MyModel, self).__init__()
         self.embedding = keras.layers.Embedding(max_features, embedding_dims, input_length=maxlen)
         if flag == 1:
-            self.rnn = keras.layers.LSTM(128)
+            self.rnn = keras.layers.LSTM(128, return_sequences=True)
         else:
             self.rnn = keras.layers.GRU(128)
         self.d1 = keras.layers.Dense(len(topic_iw.keys()), activation='softmax')

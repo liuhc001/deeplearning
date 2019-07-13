@@ -40,7 +40,7 @@ def load_data():
 
     dataset = tf.data.TFRecordDataset(data_path)
     dataset = dataset.map(change_data)
-    dataset_test = tf.data.TFRecordDataset(data_path)
+    dataset_test = tf.data.TFRecordDataset(test_path)
     dataset_test = dataset_test.map(change_data)
     return tk, topic_index_word, topic_word_index, dataset, dataset_test
 
@@ -56,7 +56,7 @@ class MyModel(keras.Model):
         if flag == 1:
             self.birnn = keras.layers.Bidirectional(keras.layers.LSTM(128))
         else:
-            self.rnn = keras.layers.GRU(128)
+            self.birnn = keras.layers.Bidirectional(keras.layers.GRU(128))
         self.d1 = keras.layers.Dense(len(topic_iw.keys()), activation='softmax')
 
     def call(self, x):

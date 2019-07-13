@@ -40,12 +40,40 @@ def load_data():
 
     dataset = tf.data.TFRecordDataset(data_path)
     dataset = dataset.map(change_data)
-    dataset_test = tf.data.TFRecordDataset(data_path)
+    dataset_test = tf.data.TFRecordDataset(test_path)
     dataset_test = dataset_test.map(change_data)
     return tk, topic_index_word, topic_word_index, dataset, dataset_test
 
 
 (tk, topic_iw, topic_wi, train_data, test_data) = load_data()
+
+
+class Attention(keras.layers.Layer):
+    def __init__(self, hidden_dim, **kwargs):
+        self.hidden_dim = hidden_dim
+        super(Attention, self).__init__(**kwargs)
+
+    def build(self, input_shape):
+        self.kernel = self.add_weight(name='kernel',
+                                      shape=(self.hidden_dim,),
+                                      initializer='uniform',
+                                      trainable=True)
+        super().build(input_shape)
+
+    def call(self, inputs, **kwargs):
+        dot_att = tf.tensordot(inputs, self.kernel, axes=1)
+        dot_att = tf.expand_dims(dot_att, axis=2)
+        result = dot_att*inputs
+        return result
+
+    def get_config(self):
+        base_config = super(Attention, self).get_config()
+        base_config['output_dim'] = self.output_dim
+        return base_config
+
+    @classmethod
+    def from_config(cls, config):
+        return cls(**config)
 
 
 # https://keras.io/layers/recurrent/
@@ -54,14 +82,18 @@ class MyModel(keras.Model):
         super(MyModel, self).__init__()
         self.embedding = keras.layers.Embedding(max_features, embedding_dims, input_length=maxlen)
         if flag == 1:
-            self.rnn = keras.layers.LSTM(128, return_sequences=True)
+            self.birnn = keras.layers.Bidirectional(keras.layers.LSTM(128, return_sequences=True))
         else:
-            self.rnn = keras.layers.GRU(128)
+            self.rnn = keras.layers.Bidirectional(keras.layers.GRU(128, return_sequences=True))
+        self.att = Attention(256)
+        self.flatten = keras.layers.Flatten()
         self.d1 = keras.layers.Dense(len(topic_iw.keys()), activation='softmax')
 
     def call(self, x):
         embedding = self.embedding(x)
-        x = self.rnn(embedding)
+        x = self.birnn(embedding)
+        x = self.att(x)
+        x = self.flatten(x)
         output = self.d1(x)
 
         return output
@@ -123,6 +155,6 @@ for epoch in range(EPOCHS):
                           test_loss.result(),
                           test_accuracy.result() * 100))
 
-tf.saved_model.save(model, 'model_textrnn')
+tf.saved_model.save(model, 'model_textattbirnn')
 
 # https://www.tinymind.cn/articles/4230
